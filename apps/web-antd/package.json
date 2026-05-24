@@ -52,6 +52,7 @@
     "dayjs": "catalog:",
     "echarts": "^5.5.1",
     "lodash-es": "^4.17.21",
+    "marked": "^18.0.4",
     "pinia": "catalog:",
     "tinymce": "7.9.1",
     "unplugin-vue-components": "^0.27.3",
