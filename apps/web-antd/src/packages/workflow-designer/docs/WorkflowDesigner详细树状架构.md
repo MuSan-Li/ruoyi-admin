@@ -36,7 +36,6 @@ workflow-designer/                                    # 工作流设计器包根
 │   │   │   # 功能：显示AI回答内容，支持流式输出
 │   │   │   # 配置：prompt模板、模型选择、输出格式
 │   │   │
-│   │   ├─ 📄 ClassifierNode.vue                      # 🏷️ 分类节点：智能分类判断
 │   │   │   # 功能：根据输入内容进行多分类判断
 │   │   │   # 配置：分类类别、阈值设置、目标节点映射
 │   │   │
@@ -44,7 +43,6 @@ workflow-designer/                                    # 工作流设计器包根
 │   │   │   # 功能：根据文本描述生成图像
 │   │   │   # 配置：提示词、图像尺寸、质量等级
 │   │   │
-│   │   ├─ 📄 DocumentExtractorNode.vue              # 📄 文档提取节点
 │   │   │   # 功能：从文档中提取结构化信息
 │   │   │   # 配置：提取规则、输出格式、字段映射
 │   │   │
@@ -60,7 +58,6 @@ workflow-designer/                                    # 工作流设计器包根
 │   │   │   # 功能：执行谷歌搜索并返回结果
 │   │   │   # 配置：搜索关键词、国家地区、语言、结果数量
 │   │   │
-│   │   ├─ 📄 KeywordExtractorNode.vue                # 🔑 关键词提取节点
 │   │   │   # 功能：从文本中提取关键词
 │   │   │   # 配置：提取算法、关键词数量、过滤条件
 │   │   │
@@ -76,7 +73,6 @@ workflow-designer/                                    # 工作流设计器包根
 │   │   │   # 功能：根据条件执行不同分支
 │   │   │   # 配置：条件表达式、分支映射、默认分支
 │   │   │
-│   │   ├─ 📄 TemplateNode.vue                        # 📝 模板节点：文本模板处理
 │   │   │   # 功能：使用模板引擎处理文本内容
 │   │   │   # 配置：模板内容、变量替换、输出格式
 │   │   │
@@ -139,14 +135,6 @@ workflow-designer/                                    # 工作流设计器包根
 │   ├─ 📄 AnswerNodeProperty.vue                     # 💬 回答节点属性面板
 │   │   # 功能：配置AI回答的参数和选项
 │   │   # 配置项：提示词、模型选择、温度、最大长度等
-│   │
-│   ├─ 📄 ClassifierNodeProperty.vue                 # 🏷️ 分类节点属性面板
-│   │   # 功能：配置分类器的参数和类别
-│   │   # 配置项：分类类别、阈值、目标节点映射等
-│   │
-│   ├─ 📄 KeywordExtractorNodeProperty.vue           # 🔑 关键词提取属性面板
-│   │   # 功能：配置关键词提取的参数
-│   │   # 配置项：提取算法、关键词数量、过滤规则等
 │   │
 │   ├─ 📄 StartNodeProperty.vue                      # 🚀 开始节点属性面板
 │   │   # 功能：配置工作流入口的参数
@@ -247,7 +235,6 @@ workflow-designer/                                    # 工作流设计器包根
 │   ├─ 注册方式：import.meta.glob('./components/nodes/*Node.vue', { eager: true })
 │   ├─ 键名转换：<Name>Node.vue → name.toLowerCase()
 │   │   ├─ AnswerNode.vue → 'answer'
-│   │   ├─ ClassifierNode.vue → 'classifier'
 │   │   ├─ StartNode.vue → 'start'
 │   │   └─ ...（其他节点）
 │   │
@@ -269,7 +256,6 @@ workflow-designer/                                    # 工作流设计器包根
     ├─ 注册方式：import.meta.glob('../properties/*NodeProperty.vue', { eager: true })
     ├─ 键名转换：<Name>NodeProperty.vue → name.toLowerCase()
     │   ├─ AnswerNodeProperty.vue → 'answer'
-    │   ├─ ClassifierNodeProperty.vue → 'classifier'
     │   └─ ...（其他属性面板）
     │
     ├─ 回退机制：未找到专属面板 → GenericNodeProperty.vue
@@ -293,7 +279,6 @@ workflow-designer/                                    # 工作流设计器包根
 │   ├─ 示例：
 │   │   ├─ start: (wf) => ({ prologue: '欢迎使用工作流' })
 │   │   ├─ answer: (wf) => ({ prompt: '', model_name: 'gpt-3.5-turbo' })
-│   │   └─ classifier: (wf) => ({ categories: [] })
 │   │
 │   └─ 优势：集中管理、易于维护
 │
@@ -315,7 +300,6 @@ workflow-designer/                                    # 工作流设计器包根
 │
 ├─ 🎯 图标映射（getIconByComponentName）
 │   ├─ answer → 'carbon:question-answering'          # 问答图标
-│   ├─ classifier → 'carbon:type-pattern'            # 分类图标
 │   ├─ start → 'carbon:play-outline'                 # 开始图标
 │   ├─ end → 'carbon:closed-caption'                 # 结束图标
 │   ├─ httprequest → 'carbon:http'                   # HTTP请求图标
@@ -324,7 +308,6 @@ workflow-designer/                                    # 工作流设计器包根
 │
 ├─ 🎨 颜色映射（getIconClassByComponentName）
 │   ├─ answer → 'text-green-800'                     # 绿色
-│   ├─ classifier → 'text-violet-900'                # 紫色
 │   ├─ start → 'text-blue-900'                       # 蓝色
 │   ├─ end → 'text-orange-800'                       # 橙色
 │   ├─ httprequest → 'text-slate-800'                # 灰色

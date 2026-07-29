@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { message, Modal, Spin, Empty } from 'ant-design-vue';
+import type {
+  WorkflowComponent,
+  WorkflowInfo,
+} from '#/packages/workflow-designer/types/index.d';
+
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
 import { Page } from '@vben/common-ui';
 
-import WorkflowDesigner from '#/packages/workflow-designer/StandaloneWorkflowDesigner.vue';
-import type {
-  WorkflowInfo,
-  WorkflowComponent,
-} from '#/packages/workflow-designer/types/index.d';
+import { ArrowLeftOutlined } from '@ant-design/icons-vue';
+import { Button, Empty, message, Modal, Spin } from 'ant-design-vue';
+
 import { workflowApi } from '#/api/aiflow';
+import WorkflowDesigner from '#/packages/workflow-designer/StandaloneWorkflowDesigner.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -38,7 +42,7 @@ async function fetchWorkflowComponents() {
     const res = await workflowApi.workflowComponents();
     wfComponents.value = res || [];
     generateComponentIdMap();
-  } catch (error) {
+  } catch {
     message.error('获取工作流组件失败');
     wfComponents.value = [
       { name: 'Start', title: '开始' },
@@ -135,7 +139,8 @@ async function handleSave(updated: WorkflowInfo) {
     message.success('保存成功');
 
     // 保存成功后返回列表页
-    router.push({ name: 'Workflow' });
+    // 列表页为后端菜单动态路由, 路由名由后端按 routeName+menuId 生成, 不能用 name 跳转, 改用路径跳转
+    router.push('/chat/aiflow');
   } catch (error: any) {
     message.error(error.message || '保存失败');
   } finally {
@@ -151,7 +156,7 @@ function handleCancel() {
     okText: '确定',
     cancelText: '取消',
     onOk: () => {
-      router.push({ name: 'Workflow' });
+      router.push('/chat/aiflow');
     },
   });
 }
@@ -172,7 +177,7 @@ async function handleRun() {
           name: 'WorkflowRun',
           params: { uuid: workflow.value.uuid },
         });
-      } catch (error) {
+      } catch {
         message.error('保存失败，无法运行工作流');
       }
     },
@@ -186,12 +191,20 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Page
-    :auto-content-height="true"
-    :title="pageTitle"
-    :show-back="true"
-    @back="handleCancel"
-  >
+  <Page :auto-content-height="true">
+    <template #title>
+      <div class="edit-page-heading">
+        <Button class="back-button" type="text" @click="handleCancel">
+          <template #icon>
+            <ArrowLeftOutlined />
+          </template>
+          返回列表
+        </Button>
+        <div class="heading-divider"></div>
+        <h1 class="page-title">{{ pageTitle }}</h1>
+      </div>
+    </template>
+
     <div v-if="loading" class="flex h-full items-center justify-center">
       <Spin size="large" tip="加载中..." />
     </div>
@@ -212,6 +225,42 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.edit-page-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-button {
+  height: 36px;
+  padding-inline: 8px 12px;
+  color: #334155;
+  font-weight: 500;
+}
+
+.back-button:hover {
+  color: #1677ff;
+  background: #eff6ff;
+}
+
+.heading-divider {
+  width: 1px;
+  height: 28px;
+  background: #e2e8f0;
+}
+
+.page-title {
+  overflow: hidden;
+  margin: 0;
+  color: #172033;
+  font-size: 19px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .workflow-edit-page {
   width: 100%;
   height: calc(100vh - 120px);

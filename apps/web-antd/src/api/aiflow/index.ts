@@ -89,12 +89,6 @@ export const workflowApi = {
     return adapters.httpGet<T>(`/workflow/runtime/del/${wfRuntimeUuid}`)
   },
 
-  workflowRuntimeResume<T = any>(params: {
-    runtimeUuid: string
-    feedbackContent: string
-  }) {
-    return adapters.httpPost<T>(`/workflow/runtime/resume/${params.runtimeUuid}`, { ...params })
-  },
 }
 
 export default workflowApi

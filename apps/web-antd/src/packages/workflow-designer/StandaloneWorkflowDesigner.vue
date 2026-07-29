@@ -678,4 +678,3 @@ provide('wfOnDeleteNode', (uuid: string) => onDeleteNode(uuid))
 }
 </style>
 
-

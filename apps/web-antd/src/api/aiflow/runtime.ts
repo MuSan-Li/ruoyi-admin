@@ -12,20 +12,10 @@ export interface WorkflowRunParams {
   errorCallback?: (error: string) => void
 }
 
-export interface WorkflowResumeParams {
-  runtimeUuid: string
-  feedbackContent: string
-}
-
 let workflowRunImpl: ((p: WorkflowRunParams) => Promise<void>) | null = null
-let workflowResumeImpl: ((p: WorkflowResumeParams) => Promise<void>) | null = null
 
 export function setWorkflowRunImpl(fn: (p: WorkflowRunParams) => Promise<void>) {
   workflowRunImpl = fn
-}
-
-export function setWorkflowResumeImpl(fn: (p: WorkflowResumeParams) => Promise<void>) {
-  workflowResumeImpl = fn
 }
 
 export async function workflowRun(p: WorkflowRunParams) {
@@ -42,13 +32,6 @@ export async function workflowRun(p: WorkflowRunParams) {
     })
   }
   return workflowRunImpl(p)
-}
-
-export async function workflowRuntimeResume(p: WorkflowResumeParams) {
-  if (!workflowResumeImpl) {
-    return adapters.httpPost(`/workflow/runtime/resume/${p.runtimeUuid}`, { ...p })
-  }
-  return workflowResumeImpl(p)
 }
 
 let uploadAction = '/api/file/upload'
@@ -164,4 +147,3 @@ export function workflowRuntimesClear<T = any>() {
 export function workflowRuntimeDelete<T = any>(uuid: string) {
   return adapters.httpPost<T>(`/workflow/runtime/del/${uuid}`)
 }
-

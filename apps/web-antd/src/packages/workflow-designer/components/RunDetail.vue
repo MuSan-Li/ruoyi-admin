@@ -4,7 +4,7 @@ import { Button, Input, InputNumber, Switch, Tabs, Upload, message } from 'ant-d
 import type { UploadFile } from 'ant-design-vue'
 import RuntimeNodes from './RuntimeNodes.vue'
 import SvgIcon from './SvgIcon.vue'
-import { workflowRun, workflowRuntimeResume, getUploadAction,workflowApi } from '#/api/aiflow'
+import { workflowRun, workflowApi } from '#/api/aiflow'
 import { useWfStore } from '#/packages/workflow-designer/store'
 
 interface Props {
@@ -43,9 +43,6 @@ const fileListLength = ref(0);
 const uploadRef = ref<any>(null);
 const fileList = ref<UploadFile[]>([]);
 const uploadedFileUuids = ref<string[]>([]);
-const humanFeedback = ref<boolean>(false);
-const humanFeedbackTip = ref<string>('');
-const humanFeedbackContent = ref<string>('');
 // 组件ID到组件名称的映射
 const componentIdToNameMap = ref<Record<string, string>>({});
 let controller = new AbortController()
@@ -227,10 +224,6 @@ async function run() {
                 [payload.name]: payload.content,
               };
             }
-          } else if (eventName.includes('[NODE_WAIT_FEEDBACK_BY_')) {
-            humanFeedback.value = true;
-            humanFeedbackTip.value = chunk || '';
-            message.info(humanFeedbackTip.value);
           }
         } catch (error) {
           console.error(error);
@@ -259,22 +252,6 @@ async function run() {
     const errorMessage = error?.message ?? '执行出错';
     message.error(errorMessage);
     submitting.value = false;
-  }
-}
-
-async function resume() {
-  submitting.value = true;
-  try {
-    await workflowRuntimeResume({
-      runtimeUuid: wfRuntimeUuid.value,
-      feedbackContent: humanFeedbackContent.value,
-    });
-  } catch (e) {
-    message.error(`系统提示：${e}`);
-  } finally {
-    humanFeedback.value = false;
-    humanFeedbackTip.value = '';
-    humanFeedbackContent.value = '';
   }
 }
 
@@ -413,14 +390,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="z-10 m-auto w-full max-w-screen-xl" @keydown="onKeydown">
-    <Tabs :active-key="tabObj.name" type="line" @click="handleClick">
+  <div class="run-detail" @keydown="onKeydown">
+    <Tabs
+      :active-key="tabObj.name"
+      class="run-tabs"
+      type="line"
+      @click="handleClick"
+    >
       <Tabs.TabPane key="runtimes" :tab="tabObj.tab" />
     </Tabs>
     <transition name="collapse">
       <div
         v-show="showCurrentExecution"
-        class="mb-2 max-h-[500px] overflow-y-auto"
+        class="runtime-panel"
       >
         <RuntimeNodes
           :nodes="runtimeNodes"
@@ -436,17 +418,15 @@ onUnmounted(() => {
         </div>
       </div>
     </transition>
-    <div v-if="errorMsg">{{ errorMsg }}</div>
-    <div
-      class="flex max-h-[300px] flex-col items-center justify-between space-y-2 overflow-y-auto"
-    >
-      <template v-if="!humanFeedback">
+    <div v-if="errorMsg" class="run-error">{{ errorMsg }}</div>
+    <div class="run-input-panel">
+      <div class="run-input-fields">
         <div
           v-for="(userInput, idx) in userInputs"
           :key="`${idx}_${userInput.name}`"
-          class="flex w-full"
+          class="run-input-row"
         >
-          <div class="min-w-24">{{ userInput.content.title }}</div>
+          <div class="run-input-label">{{ userInput.content.title }}</div>
           <Input.TextArea
             v-if="userInput.content.type === 1"
             v-model:value="userInput.content.value"
@@ -470,41 +450,101 @@ onUnmounted(() => {
             v-model:checked="userInput.content.value"
           />
         </div>
-        <div
-          class="flex w-full items-center justify-between text-xs text-gray-400"
-          @keydown.enter="run"
+      </div>
+      <div class="run-actions" @keydown.enter="run">
+        <div>按 Enter 提交，Shift + Enter 换行</div>
+        <Button
+          type="primary"
+          :disabled="submitting"
+          :loading="submitting"
+          @click="run"
         >
-          <div>按 Enter 提交，Shift + Enter 换行</div>
-          <Button
-            type="primary"
-            :disabled="submitting"
-            :loading="submitting"
-            @click="run"
-            >提交</Button
-          >
-        </div>
-      </template>
-      <template v-if="humanFeedback">
-        <div class="flex w-full flex-col space-y-2 p-2">
-          <div class="flex rounded-md bg-gray-100 px-2 py-1">
-            <div class="text-base text-red-500">
-              流程已暂停，等待用户输入中...
-            </div>
-          </div>
-          <div class="flex w-full flex-col">
-            <div v-if="humanFeedbackTip" class="text-sm leading-8">
-              提示：{{ humanFeedbackTip }}
-            </div>
-            <Input.TextArea
-              v-model:value="humanFeedbackContent"
-              :auto-size="{ minRows: 2, maxRows: 5 }"
-            />
-          </div>
-          <div class="flex justify-end">
-            <Button type="primary" @click="resume">提交</Button>
-          </div>
-        </div>
-      </template>
+          提交
+        </Button>
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.run-detail {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+}
+
+.run-tabs {
+  flex: none;
+}
+
+.runtime-panel {
+  min-height: 0;
+  flex: 1;
+  margin-bottom: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.run-error {
+  flex: none;
+  margin-bottom: 8px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.run-input-panel {
+  display: flex;
+  max-height: min(300px, 38vh);
+  flex: none;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.run-input-fields {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.run-input-row {
+  display: flex;
+  flex: none;
+  width: 100%;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.run-input-label {
+  width: 96px;
+  flex: none;
+  padding-top: 5px;
+  color: #334155;
+  font-size: 13px;
+}
+
+.run-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .run-input-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .run-input-label {
+    width: auto;
+    padding-top: 0;
+  }
+}
+</style>

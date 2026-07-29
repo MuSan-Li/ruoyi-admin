@@ -12,17 +12,13 @@ workflow-designer/
 ├─ components/                           # 可视化节点/边与通用组件
 │  ├─ nodes/
 │  │  ├─ AnswerNode.vue
-│  │  ├─ ClassifierNode.vue
 │  │  ├─ Dalle3Node.vue
-│  │  ├─ DocumentExtractorNode.vue
 │  │  ├─ EndNode.vue
 │  │  ├─ FaqExtractorNode.vue
 │  │  ├─ GoogleNode.vue
-│  │  ├─ KeywordExtractorNode.vue
 │  │  ├─ NodeShell.vue                   # 未提供专属节点时的通用外观
 │  │  ├─ StartNode.vue
 │  │  ├─ SwitcherNode.vue
-│  │  ├─ TemplateNode.vue
 │  │  ├─ TestNode.vue
 │  │  └─ TongyiwanxNode.vue
 │  ├─ edges/
@@ -40,8 +36,6 @@ workflow-designer/
 │
 ├─ properties/                           # 节点属性面板与默认值
 │  ├─ AnswerNodeProperty.vue
-│  ├─ ClassifierNodeProperty.vue
-│  ├─ KeywordExtractorNodeProperty.vue
 │  ├─ StartNodeProperty.vue
 │  ├─ TestNodeProperty.vue
 │  ├─ GenericNodeProperty.vue            # 通用（动态）属性面板

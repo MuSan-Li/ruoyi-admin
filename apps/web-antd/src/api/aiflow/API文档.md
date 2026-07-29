@@ -297,7 +297,7 @@ Authorization: Bearer {token}
         "isPublic": true,
         "nodes": [
           { "uuid": "node-start-2" },
-          { "uuid": "node-classifier-1" },
+          { "uuid": "node-answer-1" },
           { "uuid": "node-switcher-1" }
         ],
         "edges": [

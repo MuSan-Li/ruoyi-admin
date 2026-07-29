@@ -24,17 +24,12 @@ function getComponentNameByWorkflowComponentId(workflowComponentId: number | str
     case 1: return 'Start'
     case 2: return 'End'
     case 3: return 'Answer'
-    case 4: return 'Classifier'
-    case 5: return 'KeywordExtractor'
     case 6: return 'KnowledgeRetrieval'
-    case 7: return 'DocumentExtractor'
     case 8: return 'FaqExtractor'
     case 9: return 'Switcher'
-    case 10: return 'Template'
     case 11: return 'Dalle3'
     case 12: return 'TongyiWanx'
     case 13: return 'Google'
-    case 14: return 'HumanFeedback'
     case 15: return 'MailSend'
     case 16: return 'HttpRequest'
     default: return 'Start'
@@ -93,5 +88,4 @@ function getRealFileUrl(fileUrl: string) {
     </div>
   </div>
 </template>
-
 
